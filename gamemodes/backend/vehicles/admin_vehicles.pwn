@@ -1,0 +1,67 @@
+/*
+    ___       __          _          _    __     __    _      __         
+   /   | ____/ /___ ___  (_)___     | |  / /__  / /_  (_)____/ /__  _____
+  / /| |/ __  / __ `__ \/ / __ \    | | / / _ \/ __ \/ / ___/ / _ \/ ___/
+ / ___ / /_/ / / / / / / / / / /    | |/ /  __/ / / / / /__/ /  __(__  ) 
+/_/  |_\__,_/_/ /_/ /_/_/_/ /_/     |___/\___/_/ /_/_/\___/_/\___/____/  
+                                                                         
+    Developed by Danis Čavalić.
+*/
+#include    <ysilib\YSI_Coding\y_hooks>
+#include 	"backend/vehicles/vehicles_data/utilities.pwn"
+
+static 
+	AdminVozilo[MAX_PLAYERS];
+
+stock GetAdminVehicle(playerid) {
+    return AdminVozilo[playerid];
+}
+
+stock SetAdminVehicle(playerid, vehicleid) {
+    return AdminVozilo[playerid] = vehicleid;
+}
+
+hook OnPlayerConnect(playerid) {
+    AdminVozilo[playerid] = INVALID_VEHICLE_ID;
+}
+
+hook OnPlayerDisconnect(playerid, reason) {
+    if(AdminVozilo[playerid] != INVALID_VEHICLE_ID) {
+        DestroyVehicle(AdminVozilo[playerid]);
+        AdminVozilo[playerid] = INVALID_VEHICLE_ID;
+    }
+}
+
+YCMD:avozilo(playerid, params[], help) 
+{
+    if (!IsPlayerAuthorized(playerid, 1)) return Error(playerid, NO_AUTH);
+	if (help) Usage(playerid, "Kreira administratorsko vozilo");
+	if(AdminVozilo[playerid] != INVALID_VEHICLE_ID) {
+        DestroyVehicle(AdminVozilo[playerid]);
+        AdminVozilo[playerid] = INVALID_VEHICLE_ID;
+    }
+    else {
+        new modelid, boja;
+        if (sscanf(params, "ii", modelid, boja)) Usage(playerid, "/avozilo [Model (ID)] [Boja]");
+        else {
+            if (400 > modelid > 611) return Error(playerid, "Validni modeli su od 400 do 611.");
+
+            new Float:x, Float:y, Float:z;
+	        GetPlayerPos(playerid, x, y, z);
+            new vehicleid = AdminVozilo[playerid] = CreateVehicle(modelid, x, y, z, 0.0, boja, boja, -1);
+
+            SetVehicleNumberPlate(vehicleid, "STAFF");
+            PutPlayerInVehicle(playerid, vehicleid, 0);
+            
+            new bool:engine, bool:lights, bool:alarm, bool:doors, bool:bonnet, bool:boot, bool:objective;
+            GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
+
+            if (IsVehicleBicycle(GetVehicleModel(vehicleid))) SetVehicleParamsEx(vehicleid, true, false, false, doors, bonnet, boot, objective);
+            else SetVehicleParamsEx(vehicleid, false, false, false, doors, bonnet, boot, objective);
+            Server(playerid, "Uspjesno ste stvorili vozilo jednokratne upotrebe, model: %d, boja %d.", modelid, boja);
+            LinkVehicleToInterior(vehicleid, GetPlayerInterior(playerid));
+            SetVehicleVirtualWorld(vehicleid, GetPlayerVirtualWorld(playerid));
+        }
+    }
+    return 1;
+}
