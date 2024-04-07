@@ -17,7 +17,7 @@ To install the Monaco RolePlay, simply follow these steps:
 - Clone this repository to your local machine.
 - Download XAMPP/WAMP for MySQL (database management tool), and import database monaco.sql from the database folder.
 - Adapt SQL settings (if needed) in: gamemodes\utils\db_handler.pwn
-- Start samp-server.exe
+- Start omp-server.exe
 - Enjoy!
 
 # Some functions:
@@ -43,3 +43,7 @@ If you would like to contribute to the script, please feel free to submit a pull
 ![sa-mp-148](https://user-images.githubusercontent.com/87475152/232159199-639e16e1-626f-4025-a304-6cb5caeebad7.png)
 ![sa-mp-149](https://user-images.githubusercontent.com/87475152/232159205-3ec5b62c-d9b5-499b-ab3b-efb1114905ca.png)
 ![sa-mp-142](https://user-images.githubusercontent.com/87475152/232159232-4d819a91-1102-4bf5-8587-09993f0c0d33.png)
+
+# Updated
+- Moved to open.mp server
+- Changed password hash from SHA256_PassHash to bcrypt
